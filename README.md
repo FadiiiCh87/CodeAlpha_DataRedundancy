@@ -1,39 +1,22 @@
-# Data Redundancy Removal
+# Smart Data Quality Platform — CodeAlpha
 
-CodeAlpha Cloud Computing Internship project.
+## Features
+- Normalized-email SHA-256 duplicate detection backed by a database uniqueness constraint.
+- CSV upload (UTF-8, maximum 500 records and 2 MB) with unique/duplicate/invalid row report; uploaded files are processed in memory, not persisted.
+- Download cleaned CSV from the browser. Compare two names using an indicative similarity score (not identity verification).
+- Statistics endpoint and masked email listing for the public demo.
 
-Flask and SQLAlchemy app validating names and emails, normalizing emails, rejecting duplicate entries, and storing unique records.
+## API
+- GET /health, GET /api/stats, GET /api/records
+- POST /api/records JSON: {"name":"Alice","email":"alice@example.com"}
+- POST /api/analyze multipart form-data: file=sample.csv
+- POST /api/similarity JSON: {"first":"Alice Smith","second":"alice smith"}
 
-## Local setup
+## Deployment
+Run `pip install -r requirements.txt && gunicorn app:app`. Set `DATABASE_URL` to a PostgreSQL connection URL for persistence. Without it, SQLite is used and data on ephemeral cloud storage may disappear. Do not put credentials in GitHub.
 
-```bash
-python -m venv .venv
-# Activate the virtual environment
-pip install -r requirements.txt
-python app.py
-```
+## Testing
+`python -m pytest -q`. GitHub Actions runs tests on pushes and pull requests.
 
-Open http://127.0.0.1:5000.
-
-## Tests
-
-```bash
-python -m pytest -q
-```
-
-## Configuration
-
-SQLite is used by default; set DATABASE_URL for a supported remote database.
-
-## Files
-
-- `app.py`: Flask backend
-- `templates/index.html`: frontend
-- `static/style.css`: UI
-- `tests/test_app.py`: tests
-- `requirements.txt`: dependencies
-- `Procfile`: Gunicorn startup
-
-## Scope
-
-Educational prototype. Deployment and production security review have not been completed.
+## Limitations
+Educational demo: no authentication for writes; public listing masks emails but still shows names. Use access control and abuse prevention before handling real customer data. Fuzzy matching is advisory, not automatic merging.
